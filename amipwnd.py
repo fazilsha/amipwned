@@ -7,6 +7,7 @@
 '''
 import requests
 import hashlib
+import sys
 
 class Amipwned():
     def __init__(self,passwd):
@@ -16,13 +17,15 @@ class Amipwned():
         h5,hl = hashes[:5],hashes[5:]
         url = requests.get("https://api.pwnedpasswords.com/range/"+h5)
         if url.status_code == 200:
-            print("Connected!")
-            hash_list = (hash_elem.split(":") for hash_elem in url.text.splitlines())
+            print("Connected to pwned database...")
+            hash_list = [hash_elem.split(":") for hash_elem in url.text.splitlines()]
             for k,v in hash_list:
                 if k == hl:
-                    return f"Your password found in a data breach: {v} times! Feel free to change the password to protect your data.."
+                    return f"Your password found in a data breach: {v} times! Feel free to change the password to protect your data.." 
+                elif len(hash_list) == hash_list.index([k,v])+1:
+                    return f"No worries!! your data is not compromised!  you are safe"
         else:
             print("Not connected!!")
 
-A=Amipwned("hello")
-A.pwdcheck()
+A=Amipwned(sys.argv[1])
+print(A.pwdcheck())
